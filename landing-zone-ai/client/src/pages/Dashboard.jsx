@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Upload, X, Check, Loader2, AlertCircle } from 'lucide-react'
+import { Upload, X, Check, Loader2, AlertCircle, Activity } from 'lucide-react'
 import Button from '../components/common/Button'
 
 // Dashboard Specimen - Functional Upload Interface

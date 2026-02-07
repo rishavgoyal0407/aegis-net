@@ -1,9 +1,15 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
 from services.inference import InferenceService
 from config import Config
 
 app = Flask(__name__)
+CORS(app)
 inference_service = InferenceService()
+
+@app.route('/heatmaps/<path:filename>')
+def serve_heatmap(filename):
+    return send_from_directory(Config.HEATMAP_FOLDER, filename)
 
 @app.route('/predict', methods=['POST'])
 def predict():

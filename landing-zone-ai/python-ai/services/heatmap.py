@@ -20,20 +20,16 @@ def generate_heatmap(mean_pred, variance=None, original_image=None):
     
     H, W = mean_pred.shape
     
-    # Create RGB heatmap: Green (safe) to Red (unsafe)
-    # High probability = Green [0, 255, 0]
-    # Low probability = Red [255, 0, 0]
+    # Create BGR heatmap (since OpenCV is used for saving)
+    heatmap_bgr = np.zeros((H, W, 3), dtype=np.uint8)
     
-    heatmap_rgb = np.zeros((H, W, 3), dtype=np.uint8)
-    
-    # Red channel: inversely proportional to confidence
-    heatmap_rgb[:, :, 2] = ((1 - mean_pred) * 255).astype(np.uint8)  # BGR: B channel
-    # Green channel: proportional to confidence  
-    heatmap_rgb[:, :, 1] = (mean_pred * 255).astype(np.uint8)        # BGR: G channel
-    # Blue channel: 0 (or use for uncertainty visualization)
+    # Red channel (BGR index 2): inversely proportional to confidence
+    heatmap_bgr[:, :, 2] = ((1 - mean_pred) * 255).astype(np.uint8)
+    # Green channel (BGR index 1): proportional to confidence  
+    heatmap_bgr[:, :, 1] = (mean_pred * 255).astype(np.uint8)
+    # Blue channel (BGR index 0): handles uncertainty visualization
     if variance is not None:
-        # Encode uncertainty in blue channel
-        heatmap_rgb[:, :, 0] = (variance * 255).astype(np.uint8)     # BGR: R channel
+        heatmap_bgr[:, :, 0] = (variance * 255).astype(np.uint8)
     
     # If original image provided, create overlay
     if original_image is not None:
@@ -51,9 +47,9 @@ def generate_heatmap(mean_pred, variance=None, original_image=None):
             original_bgr = original_image
             
         # Blend: 60% original + 40% heatmap
-        overlay = cv2.addWeighted(original_bgr, 0.6, heatmap_rgb, 0.4, 0)
+        overlay = cv2.addWeighted(original_bgr, 0.6, heatmap_bgr, 0.4, 0)
     else:
-        overlay = heatmap_rgb
+        overlay = heatmap_bgr
     
     # Save
     output_dir = Config.HEATMAP_FOLDER
