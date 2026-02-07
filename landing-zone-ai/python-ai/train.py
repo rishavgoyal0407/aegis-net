@@ -36,10 +36,14 @@ def train(args):
 
     # Model
     model = ResNetUNet(n_class=1).to(device)
+    
+    # Freeze Backbone (Train Only Decoder)
+    model.freeze_backbone()
 
     # Loss & Optimizer
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    # Only optimize parameters that require gradients
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
 
     print(f"Starting training for {args.epochs} epochs...")
 

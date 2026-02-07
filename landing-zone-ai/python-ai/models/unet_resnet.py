@@ -32,6 +32,13 @@ class ResNetUNet(nn.Module):
             nn.Conv2d(32, n_class, kernel_size=1)
         )
 
+    def freeze_backbone(self):
+        """Freezes the ResNet backbone layers."""
+        for layer in [self.layer0, self.layer0_1, self.layer1, self.layer2, self.layer3]:
+            for param in layer.parameters():
+                param.requires_grad = False
+        print("ResNet backbone frozen.")
+
     def up_block(self, in_channels, out_channels):
         return nn.Sequential(
             nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
